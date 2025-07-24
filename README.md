@@ -53,7 +53,6 @@ This tool is especially useful for:
 
 ### 👨‍💻 Android Developers
 - Quickly launch emulators with predefined resource settings.
-- Test GPS/location-based features with simulated coordinates.
 - Skip launching Android Studio just to run an emulator.
 
 ### 🧪 QA Engineers & Testers
