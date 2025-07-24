@@ -13,7 +13,6 @@
   - Cold Boot (with data wipe)
   - Standard
   - Performance Mode (high resource config)
-- 🌐 GPS location configuration with presets and custom coordinates
 - 📊 System and SDK diagnostics
 - 🔄 Emulator status viewer and process manager
 
