@@ -45,7 +45,7 @@ $script:Config = @{
     DefaultCores = 4
     BootTimeout = 120
 }
-
+```
 
 ## 🧰 Use Cases
 
