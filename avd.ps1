@@ -170,14 +170,30 @@ function Wait-ForEmulatorBoot {
                 Write-Host "[SUCCESS] Emulator booted successfully ($elapsed seconds)" -ForegroundColor Green
                 
                 # Verify connectivity
-                Write-Host "[INFO] Verifying emulator connectivity..."
+                Write-Host "[INFO] Verifying emulator connectivity..." -ForegroundColor Cyan
+                
+                # Check package manager
                 $packageCount = & $script:Config.AdbPath shell pm list packages 2>$null | Measure-Object | Select-Object -ExpandProperty Count
                 
+                # Test network connectivity
+                $networkStatus = & $script:Config.AdbPath shell ping -c 1 8.8.8.8 2>$null
+                $hasInternet = $LASTEXITCODE -eq 0
+                
                 if ($packageCount -gt 0) {
-                    Write-Host "[SUCCESS] Emulator is fully operational ($packageCount packages detected)" -ForegroundColor Green
-                    return $true
+                    Write-Host "[SUCCESS] System services operational ($packageCount packages detected)" -ForegroundColor Green
+                    if ($hasInternet) {
+                        Write-Host "[SUCCESS] Internet connectivity verified" -ForegroundColor Green
+                        return $true
+                    } else {
+                        Write-Host "[WARNING] Internet connectivity issues detected" -ForegroundColor Yellow
+                        Write-Host "[HELP] Try the following:" -ForegroundColor Cyan
+                        Write-Host "  * Verify host machine has internet access" -ForegroundColor Gray
+                        Write-Host "  * Check Windows Firewall settings" -ForegroundColor Gray
+                        Write-Host "  * Ensure no VPN is interfering with emulator" -ForegroundColor Gray
+                        Write-Host "  * Try restarting the emulator with '-dns-server 8.8.8.8'" -ForegroundColor Gray
+                    }
                 } else {
-                    Write-Host "[WARNING] Emulator started but connectivity issues detected" -ForegroundColor Yellow
+                    Write-Host "[WARNING] System services not fully initialized" -ForegroundColor Yellow
                 }
                 return $true
             }
@@ -318,7 +334,10 @@ function Start-EmulatorInstance {
                 "-no-snapshot-save",
                 "-gpu", "host",
                 "-memory", $script:Config.DefaultMemory,
-                "-cores", $script:Config.DefaultCores
+                "-cores", $script:Config.DefaultCores,
+                "-dns-server", "8.8.8.8",
+                "-netdelay", "none",
+                "-netspeed", "full"
             )
         }
         
@@ -365,7 +384,10 @@ function Start-EmulatorInstance {
                 "-memory", 4096,
                 "-cores", 6,
                 "-cache-size", 1024,
-                "-partition-size", 2048
+                "-partition-size", 2048,
+                "-dns-server", "8.8.8.8",
+                "-netdelay", "none",
+                "-netspeed", "full"
             )
         }
         
