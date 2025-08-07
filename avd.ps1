@@ -98,7 +98,7 @@ MANAGEMENT OPTIONS:
 [7] Kill All          - Terminate all emulator instances
 [8] System Info       - Show system and SDK information
 [9] Exit              - Close application
-
+[10] Debug Mode      - Minimal settings for troubleshooting
 ================================================================================
 "@
     Write-Host $menuText -ForegroundColor White
@@ -390,6 +390,21 @@ function Start-EmulatorInstance {
                 "-netspeed", "full"
             )
         }
+
+        "debug" {
+    $modeDescription = "Debug Mode (Minimal Settings)"
+    Write-Host "[INFO] Using minimal settings for troubleshooting..." -ForegroundColor Yellow
+    $emulatorArgs = @(
+        "-avd", $script:Config.AvdName,
+        "-gpu", "off",
+        "-no-snapshot-load",
+        "-no-snapshot-save",
+        "-memory", 1024,
+        "-cores", 2,
+        "-no-audio",
+        "-no-boot-anim"
+    )
+}
         
         default {
             Write-Host "[ERROR] Invalid launch mode: $LaunchMode" -ForegroundColor Red
@@ -474,6 +489,11 @@ function Invoke-MenuAction {
             Write-Host "Thank you for using Android Emulator Launcher!" -ForegroundColor Green
             exit 0
         }
+        "10" { 
+    $result = Start-EmulatorInstance -LaunchMode "debug"
+    if (-not $result) { Read-Host "Press Enter to continue" }
+}
+
         default {
             Write-Host "[ERROR] Invalid selection. Please choose 1-9." -ForegroundColor Red
             Start-Sleep -Seconds 2
@@ -519,7 +539,7 @@ function Start-EmulatorLauncher {
         Show-Header
         Show-MainMenu
         
-        $userChoice = Read-Host "Select option [1-9]"
+        $userChoice = Read-Host "Select option [1-10]"
         Invoke-MenuAction -Choice $userChoice.Trim()
         
     } while ($true)
